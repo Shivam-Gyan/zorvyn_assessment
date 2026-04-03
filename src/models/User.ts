@@ -33,6 +33,8 @@ const userSchema = new Schema<IUser, IUserModel>(
   { timestamps: true, versionKey: false },
 );
 
+userSchema.index({ email: 1 }, { unique: true });
+
 userSchema.pre('save', async function hashPassword(next) {
   if (!this.isModified('password')) {
     return next();
