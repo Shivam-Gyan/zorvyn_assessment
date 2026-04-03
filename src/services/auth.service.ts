@@ -8,6 +8,7 @@ interface RegisterInput {
   name: string;
   email: string;
   password: string;
+  role?: UserRole; // Optional, will be overridden to 'member' in service for security
 }
 
 interface LoginInput {
@@ -33,7 +34,7 @@ export const authService = {
     const user = await User.create({
       ...payload,
       // Security: prevent privilege escalation on signup
-      role: 'member',
+      role: payload.role ?? 'member',
     });
     const token = signToken(user.id, user.role);
 

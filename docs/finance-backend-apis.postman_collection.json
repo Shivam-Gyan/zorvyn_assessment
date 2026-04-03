@@ -1,0 +1,597 @@
+{
+  "info": {
+    "name": "Finance Backend APIs",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "http://localhost:5000/api/v1"
+    },
+    {
+      "key": "token",
+      "value": ""
+    }
+  ],
+  "item": [
+    {
+      "name": "Health",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "http://localhost:5000/health",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "5000",
+          "path": ["health"]
+        }
+      },
+      "response": [
+        {
+          "name": "200 Service healthy",
+          "originalRequest": {
+            "method": "GET",
+            "url": {
+              "raw": "http://localhost:5000/health",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "5000",
+              "path": ["health"]
+            }
+          },
+          "status": "OK",
+          "code": 200,
+          "header": [
+            { "key": "Content-Type", "value": "application/json" }
+          ],
+          "body": "{\n  \"success\": true,\n  \"message\": \"Service healthy\",\n  \"data\": {\n    \"timestamp\": \"2026-01-01T00:00:00.000Z\"\n  },\n  \"error\": null\n}"
+        }
+      ]
+    },
+    {
+      "name": "Auth",
+      "item": [
+        {
+          "name": "Register",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"John\",\n  \"email\": \"john@example.com\",\n  \"password\": \"Password123\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/auth/register",
+              "host": ["{{base_url}}"],
+              "path": ["auth", "register"]
+            }
+          },
+          "response": [
+            {
+              "name": "201 User registered",
+              "originalRequest": {
+                "method": "POST",
+                "url": {
+                  "raw": "{{base_url}}/auth/register",
+                  "host": ["{{base_url}}"],
+                  "path": ["auth", "register"]
+                }
+              },
+              "status": "Created",
+              "code": 201,
+              "header": [
+                { "key": "Content-Type", "value": "application/json" }
+              ],
+              "body": "{\n  \"success\": true,\n  \"message\": \"User registered successfully\",\n  \"data\": {\n    \"user\": {\n      \"id\": \"...\",\n      \"name\": \"John\",\n      \"email\": \"john@example.com\",\n      \"role\": \"member\"\n    },\n    \"accessToken\": \"<JWT>\"\n  },\n  \"error\": null\n}"
+            }
+          ]
+        },
+        {
+          "name": "Login",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"john@example.com\",\n  \"password\": \"Password123\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/auth/login",
+              "host": ["{{base_url}}"],
+              "path": ["auth", "login"]
+            }
+          },
+          "response": [
+            {
+              "name": "200 Login successful",
+              "originalRequest": {
+                "method": "POST",
+                "url": {
+                  "raw": "{{base_url}}/auth/login",
+                  "host": ["{{base_url}}"],
+                  "path": ["auth", "login"]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "header": [
+                { "key": "Content-Type", "value": "application/json" }
+              ],
+              "body": "{\n  \"success\": true,\n  \"message\": \"Login successful\",\n  \"data\": {\n    \"user\": {\n      \"id\": \"...\",\n      \"name\": \"John\",\n      \"email\": \"john@example.com\",\n      \"role\": \"member\"\n    },\n    \"accessToken\": \"<JWT>\"\n  },\n  \"error\": null\n}"
+            }
+          ]
+        },
+        {
+          "name": "Me",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/auth/me",
+              "host": ["{{base_url}}"],
+              "path": ["auth", "me"]
+            }
+          },
+          "response": [
+            {
+              "name": "200 Profile fetched",
+              "originalRequest": {
+                "method": "GET",
+                "url": {
+                  "raw": "{{base_url}}/auth/me",
+                  "host": ["{{base_url}}"],
+                  "path": ["auth", "me"]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "header": [
+                { "key": "Content-Type", "value": "application/json" }
+              ],
+              "body": "{\n  \"success\": true,\n  \"message\": \"Profile fetched\",\n  \"data\": {\n    \"_id\": \"...\",\n    \"name\": \"John\",\n    \"email\": \"john@example.com\",\n    \"role\": \"member\",\n    \"isActive\": true,\n    \"createdAt\": \"...\",\n    \"updatedAt\": \"...\"\n  },\n  \"error\": null\n}"
+            }
+          ]
+        },
+        {
+          "name": "Admin - List Users",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/users",
+              "host": ["{{base_url}}"],
+              "path": ["users"]
+            }
+          },
+          "response": [
+            {
+              "name": "200 Users fetched",
+              "originalRequest": {
+                "method": "GET",
+                "url": {
+                  "raw": "{{base_url}}/users",
+                  "host": ["{{base_url}}"],
+                  "path": ["users"]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "header": [
+                { "key": "Content-Type", "value": "application/json" }
+              ],
+              "body": "{\n  \"success\": true,\n  \"message\": \"Users fetched\",\n  \"data\": [\n    {\n      \"_id\": \"...\",\n      \"name\": \"John\",\n      \"email\": \"john@example.com\",\n      \"role\": \"member\",\n      \"isActive\": true,\n      \"createdAt\": \"...\",\n      \"updatedAt\": \"...\"\n    }\n  ],\n  \"error\": null\n}"
+            }
+          ]
+        },
+        {
+          "name": "Admin - Update User",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"role\": \"admin\",\n  \"isActive\": true\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/users/:userId",
+              "host": ["{{base_url}}"],
+              "path": ["users", ":userId"]
+            }
+          },
+          "response": [
+            {
+              "name": "200 User updated",
+              "originalRequest": {
+                "method": "PATCH",
+                "url": {
+                  "raw": "{{base_url}}/users/:userId",
+                  "host": ["{{base_url}}"],
+                  "path": ["users", ":userId"]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "header": [
+                { "key": "Content-Type", "value": "application/json" }
+              ],
+              "body": "{\n  \"success\": true,\n  \"message\": \"User updated\",\n  \"data\": {\n    \"_id\": \"...\",\n    \"name\": \"John\",\n    \"email\": \"john@example.com\",\n    \"role\": \"admin\",\n    \"isActive\": true,\n    \"createdAt\": \"...\",\n    \"updatedAt\": \"...\"\n  },\n  \"error\": null\n}"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Transactions",
+      "item": [
+        {
+          "name": "Create Transaction",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"amount\": 1000,\n  \"type\": \"income\",\n  \"category\": \"salary\",\n  \"date\": \"2026-01-01\",\n  \"notes\": \"Monthly salary\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/transactions",
+              "host": ["{{base_url}}"],
+              "path": ["transactions"]
+            }
+          },
+          "response": [
+            {
+              "name": "201 Transaction created",
+              "originalRequest": {
+                "method": "POST",
+                "url": {
+                  "raw": "{{base_url}}/transactions",
+                  "host": ["{{base_url}}"],
+                  "path": ["transactions"]
+                }
+              },
+              "status": "Created",
+              "code": 201,
+              "header": [
+                { "key": "Content-Type", "value": "application/json" }
+              ],
+              "body": "{\n  \"success\": true,\n  \"message\": \"Transaction created\",\n  \"data\": {\n    \"_id\": \"...\",\n    \"amount\": 1000,\n    \"type\": \"income\",\n    \"category\": \"salary\",\n    \"date\": \"2026-01-01T00:00:00.000Z\",\n    \"notes\": \"Monthly salary\",\n    \"createdBy\": \"...\",\n    \"createdAt\": \"...\",\n    \"updatedAt\": \"...\"\n  },\n  \"error\": null\n}"
+            }
+          ]
+        },
+        {
+          "name": "List Transactions",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/transactions?page=1&limit=10&sortBy=createdAt&sortOrder=desc",
+              "host": ["{{base_url}}"],
+              "path": ["transactions"],
+              "query": [
+                { "key": "page", "value": "1" },
+                { "key": "limit", "value": "10" },
+                { "key": "sortBy", "value": "createdAt" },
+                { "key": "sortOrder", "value": "desc" }
+              ]
+            }
+          },
+          "response": [
+            {
+              "name": "200 Transactions fetched",
+              "originalRequest": {
+                "method": "GET",
+                "url": {
+                  "raw": "{{base_url}}/transactions?page=1&limit=10&sortBy=createdAt&sortOrder=desc",
+                  "host": ["{{base_url}}"],
+                  "path": ["transactions"],
+                  "query": [
+                    { "key": "page", "value": "1" },
+                    { "key": "limit", "value": "10" },
+                    { "key": "sortBy", "value": "createdAt" },
+                    { "key": "sortOrder", "value": "desc" }
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "header": [
+                { "key": "Content-Type", "value": "application/json" }
+              ],
+              "body": "{\n  \"success\": true,\n  \"message\": \"Transactions fetched\",\n  \"data\": {\n    \"items\": [],\n    \"pagination\": {\n      \"page\": 1,\n      \"limit\": 10,\n      \"total\": 0,\n      \"totalPages\": 0\n    }\n  },\n  \"error\": null\n}"
+            }
+          ]
+        },
+        {
+          "name": "Get Transaction",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/transactions/:transactionId",
+              "host": ["{{base_url}}"],
+              "path": ["transactions", ":transactionId"]
+            }
+          },
+          "response": [
+            {
+              "name": "200 Transaction fetched",
+              "originalRequest": {
+                "method": "GET",
+                "url": {
+                  "raw": "{{base_url}}/transactions/:transactionId",
+                  "host": ["{{base_url}}"],
+                  "path": ["transactions", ":transactionId"]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "header": [
+                { "key": "Content-Type", "value": "application/json" }
+              ],
+              "body": "{\n  \"success\": true,\n  \"message\": \"Transaction fetched\",\n  \"data\": {\n    \"_id\": \"...\",\n    \"amount\": 1000,\n    \"type\": \"income\",\n    \"category\": \"salary\",\n    \"date\": \"2026-01-01T00:00:00.000Z\",\n    \"notes\": \"Monthly salary\",\n    \"createdBy\": {\n      \"_id\": \"...\",\n      \"name\": \"John\",\n      \"email\": \"john@example.com\",\n      \"role\": \"member\"\n    },\n    \"createdAt\": \"...\",\n    \"updatedAt\": \"...\"\n  },\n  \"error\": null\n}"
+            }
+          ]
+        },
+        {
+          "name": "Update Transaction",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"amount\": 1200,\n  \"notes\": \"Updated note\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/transactions/:transactionId",
+              "host": ["{{base_url}}"],
+              "path": ["transactions", ":transactionId"]
+            }
+          },
+          "response": [
+            {
+              "name": "200 Transaction updated",
+              "originalRequest": {
+                "method": "PATCH",
+                "url": {
+                  "raw": "{{base_url}}/transactions/:transactionId",
+                  "host": ["{{base_url}}"],
+                  "path": ["transactions", ":transactionId"]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "header": [
+                { "key": "Content-Type", "value": "application/json" }
+              ],
+              "body": "{\n  \"success\": true,\n  \"message\": \"Transaction updated\",\n  \"data\": {\n    \"_id\": \"...\"\n  },\n  \"error\": null\n}"
+            }
+          ]
+        },
+        {
+          "name": "Delete Transaction",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/transactions/:transactionId",
+              "host": ["{{base_url}}"],
+              "path": ["transactions", ":transactionId"]
+            }
+          },
+          "response": [
+            {
+              "name": "200 Transaction deleted",
+              "originalRequest": {
+                "method": "DELETE",
+                "url": {
+                  "raw": "{{base_url}}/transactions/:transactionId",
+                  "host": ["{{base_url}}"],
+                  "path": ["transactions", ":transactionId"]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "header": [
+                { "key": "Content-Type", "value": "application/json" }
+              ],
+              "body": "{\n  \"success\": true,\n  \"message\": \"Transaction deleted\",\n  \"data\": null,\n  \"error\": null\n}"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Dashboard",
+      "item": [
+        {
+          "name": "Summary",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/dashboard/summary?interval=month&limit=5",
+              "host": ["{{base_url}}"],
+              "path": ["dashboard", "summary"],
+              "query": [
+                { "key": "interval", "value": "month" },
+                { "key": "limit", "value": "5" }
+              ]
+            }
+          },
+          "response": [
+            {
+              "name": "200 Dashboard summary",
+              "originalRequest": {
+                "method": "GET",
+                "url": {
+                  "raw": "{{base_url}}/dashboard/summary?interval=month&limit=5",
+                  "host": ["{{base_url}}"],
+                  "path": ["dashboard", "summary"],
+                  "query": [
+                    { "key": "interval", "value": "month" },
+                    { "key": "limit", "value": "5" }
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "header": [
+                { "key": "Content-Type", "value": "application/json" }
+              ],
+              "body": "{\n  \"success\": true,\n  \"message\": \"Dashboard summary fetched\",\n  \"data\": {\n    \"totalIncome\": 50000,\n    \"totalExpenses\": 30000,\n    \"netBalance\": 20000\n  },\n  \"error\": null\n}"
+            }
+          ]
+        },
+        {
+          "name": "Categories",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/dashboard/categories?interval=month&limit=5",
+              "host": ["{{base_url}}"],
+              "path": ["dashboard", "categories"],
+              "query": [
+                { "key": "interval", "value": "month" },
+                { "key": "limit", "value": "5" }
+              ]
+            }
+          },
+          "response": [
+            {
+              "name": "200 Dashboard categories",
+              "originalRequest": {
+                "method": "GET",
+                "url": {
+                  "raw": "{{base_url}}/dashboard/categories?interval=month&limit=5",
+                  "host": ["{{base_url}}"],
+                  "path": ["dashboard", "categories"],
+                  "query": [
+                    { "key": "interval", "value": "month" },
+                    { "key": "limit", "value": "5" }
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "header": [
+                { "key": "Content-Type", "value": "application/json" }
+              ],
+              "body": "{\n  \"success\": true,\n  \"message\": \"Dashboard categories fetched\",\n  \"data\": [\n    { \"category\": \"salary\", \"amount\": 50000, \"count\": 5 }\n  ],\n  \"error\": null\n}"
+            }
+          ]
+        },
+        {
+          "name": "Trends",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/dashboard/trends?interval=month&limit=5",
+              "host": ["{{base_url}}"],
+              "path": ["dashboard", "trends"],
+              "query": [
+                { "key": "interval", "value": "month" },
+                { "key": "limit", "value": "5" }
+              ]
+            }
+          },
+          "response": [
+            {
+              "name": "200 Dashboard trends",
+              "originalRequest": {
+                "method": "GET",
+                "url": {
+                  "raw": "{{base_url}}/dashboard/trends?interval=month&limit=5",
+                  "host": ["{{base_url}}"],
+                  "path": ["dashboard", "trends"],
+                  "query": [
+                    { "key": "interval", "value": "month" },
+                    { "key": "limit", "value": "5" }
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "header": [
+                { "key": "Content-Type", "value": "application/json" }
+              ],
+              "body": "{\n  \"success\": true,\n  \"message\": \"Dashboard trends fetched\",\n  \"data\": [\n    { \"period\": { \"year\": 2026, \"month\": 1 }, \"income\": 5000, \"expense\": 1800, \"net\": 3200 }\n  ],\n  \"error\": null\n}"
+            }
+          ]
+        },
+        {
+          "name": "Recent",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/dashboard/recent?interval=month&limit=5",
+              "host": ["{{base_url}}"],
+              "path": ["dashboard", "recent"],
+              "query": [
+                { "key": "interval", "value": "month" },
+                { "key": "limit", "value": "5" }
+              ]
+            }
+          },
+          "response": [
+            {
+              "name": "200 Dashboard recent",
+              "originalRequest": {
+                "method": "GET",
+                "url": {
+                  "raw": "{{base_url}}/dashboard/recent?interval=month&limit=5",
+                  "host": ["{{base_url}}"],
+                  "path": ["dashboard", "recent"],
+                  "query": [
+                    { "key": "interval", "value": "month" },
+                    { "key": "limit", "value": "5" }
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "header": [
+                { "key": "Content-Type", "value": "application/json" }
+              ],
+              "body": "{\n  \"success\": true,\n  \"message\": \"Dashboard recent transactions fetched\",\n  \"data\": [\n    {\n      \"_id\": \"...\",\n      \"amount\": 1000,\n      \"type\": \"income\",\n      \"category\": \"salary\",\n      \"date\": \"2026-01-01T00:00:00.000Z\",\n      \"notes\": \"Monthly salary\",\n      \"createdBy\": \"...\"\n    }\n  ],\n  \"error\": null\n}"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
