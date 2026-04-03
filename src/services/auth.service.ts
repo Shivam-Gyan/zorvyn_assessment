@@ -1,4 +1,4 @@
-import jwt from 'jsonwebtoken';
+import jwt, { SignOptions } from 'jsonwebtoken';
 import { User } from '../models/User';
 import { env } from '../config/env';
 import { ApiError } from '../utils/ApiError';
@@ -8,7 +8,6 @@ interface RegisterInput {
   name: string;
   email: string;
   password: string;
-  role?: UserRole;
 }
 
 interface LoginInput {
@@ -17,9 +16,11 @@ interface LoginInput {
 }
 
 const signToken = (sub: string, role: UserRole): string => {
-  return jwt.sign({ sub, role }, env.jwtAccessSecret, {
-    expiresIn: env.jwtAccessTtl,
-  });
+  const options: SignOptions = {
+    expiresIn: env.jwtAccessTtl as SignOptions['expiresIn'],
+  };
+
+  return jwt.sign({ sub, role }, env.jwtAccessSecret, options);
 };
 
 export const authService = {
@@ -29,7 +30,11 @@ export const authService = {
       throw new ApiError(409, 'Email is already registered');
     }
 
-    const user = await User.create(payload);
+    const user = await User.create({
+      ...payload,
+      // Security: prevent privilege escalation on signup
+      role: 'member',
+    });
     const token = signToken(user.id, user.role);
 
     return {

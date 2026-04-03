@@ -1,92 +1,210 @@
-# Zorvyn Assessment Backend
+# Finance Dashboard Backend
 
-A production-style backend system for task and project management built with **Node.js**, **Express**, **MongoDB (Mongoose)**, and **TypeScript**. The system is structured using clean layering principles (route → controller → service → model), robust validation, and centralized error handling.
+A clean, layered backend API for finance data processing and dashboard insights, built on Node.js + Express + MongoDB + TypeScript.
 
-## 1) Project Overview
+## Project Overview
 
-This API provides:
+This system is transformed from a generic task/project domain into a **finance domain** centered on transactions and analytics:
 
-- JWT-based authentication (`register`, `login`, `me`)
-- Role-based authorization (`admin`, `manager`, `member`)
-- Project management with ownership and membership
-- Task management with filtering, sorting, and pagination
-- Consistent API response format
-- Input validation for body, query, and params
-- Centralized error handling for operational and unexpected errors
+- Record financial transactions (income/expense)
+- Query transactions with filtering, date range, sorting, and pagination
+- Generate dashboard insights via MongoDB aggregation pipelines
+- Protect APIs with JWT auth + role-based access control (RBAC)
 
-## 2) Tech Stack
+## Tech Stack
 
-- **Runtime**: Node.js
-- **Framework**: Express.js
-- **Language**: TypeScript
-- **Database**: MongoDB
-- **ODM**: Mongoose
-- **Validation**: Zod
-- **Security**: Helmet, CORS, JWT, bcrypt
-- **Observability**: Morgan logging
-- **Performance/Safety**: Express rate limiter
-- **Tests**: Jest + Supertest
+- Node.js, Express.js
+- TypeScript
+- MongoDB + Mongoose
+- Zod (validation)
+- JWT + bcryptjs (auth)
+- Helmet, CORS, Morgan, express-rate-limit
 
-## 3) Folder Structure
+## Architecture (Preserved)
+
+The existing architecture is preserved:
+
+- **Routes**: endpoint declarations only
+- **Controllers**: HTTP request/response handling
+- **Services**: business logic and aggregation pipelines
+- **Models**: schema definitions
+- **Middlewares**: auth, validation, rate limiting, error handling
+
+## Folder Structure
 
 ```txt
-.
-├── src
-│   ├── config
-│   │   ├── database.ts
-│   │   └── env.ts
-│   ├── controllers
-│   │   ├── auth.controller.ts
-│   │   ├── project.controller.ts
-│   │   └── task.controller.ts
-│   ├── middlewares
-│   │   ├── asyncHandler.ts
-│   │   ├── auth.middleware.ts
-│   │   ├── errorHandler.ts
-│   │   ├── rateLimiter.ts
-│   │   └── validate.middleware.ts
-│   ├── models
-│   │   ├── Project.ts
-│   │   ├── Task.ts
-│   │   └── User.ts
-│   ├── routes
-│   │   ├── auth.routes.ts
-│   │   ├── index.ts
-│   │   ├── project.routes.ts
-│   │   └── task.routes.ts
-│   ├── services
-│   │   ├── auth.service.ts
-│   │   ├── project.service.ts
-│   │   └── task.service.ts
-│   ├── types
-│   │   └── index.ts
-│   ├── utils
-│   │   ├── ApiError.ts
-│   │   ├── apiResponse.ts
-│   │   └── constants.ts
-│   ├── validators
-│   │   ├── auth.validators.ts
-│   │   ├── common.validators.ts
-│   │   ├── project.validators.ts
-│   │   └── task.validators.ts
-│   └── app.ts
-├── tests
-│   └── health.test.ts
-├── .env.example
-├── jest.config.ts
-├── package.json
-├── server.ts
-└── tsconfig.json
+src/
+├── config/
+├── models/
+│   ├── User.ts
+│   └── Transaction.ts
+├── routes/
+│   ├── auth.routes.ts
+│   ├── transaction.routes.ts
+│   ├── dashboard.routes.ts
+│   ├── user.routes.ts
+│   └── index.ts
+├── controllers/
+│   ├── auth.controller.ts
+│   ├── transaction.controller.ts
+│   ├── dashboard.controller.ts
+│   └── user.controller.ts
+├── services/
+│   ├── auth.service.ts
+│   ├── transaction.service.ts
+│   ├── dashboard.service.ts
+│   └── user.service.ts
+├── middlewares/
+├── utils/
+├── validators/
+│   ├── auth.validators.ts
+│   ├── common.validators.ts
+│   ├── transaction.validators.ts
+│   ├── dashboard.validators.ts
+│   └── user.validators.ts
+└── app.ts
+
+server.ts
 ```
 
-## 4) Setup Instructions
+## Finance Domain Explanation
 
-### Prerequisites
+The backend now models personal/organizational finance data where each entry is a **Transaction**. The previous task/project flow is deprecated and replaced by:
 
-- Node.js 18+
-- MongoDB local instance or MongoDB Atlas
+- `/api/v1/transactions` for financial records
+- `/api/v1/dashboard/*` for aggregated insights
 
-### Install & Run
+## Transaction Model
+
+`Transaction` fields:
+
+- `amount`: number, required, non-negative
+- `type`: enum (`income` | `expense`), required
+- `category`: string, required
+- `date`: date, required
+- `notes`: string, optional
+- `createdBy`: reference to `User`, required
+
+## Role Mapping
+
+Existing role values are preserved in storage, but mapped semantically for finance operations:
+
+- `admin` → **Admin** (full access)
+- `manager` → **Analyst** (read + dashboard access)
+- `member` → **Viewer** (read-only transactions)
+
+### Permission Rules
+
+- **Viewer (`member`)**: can read transactions only
+- **Analyst (`manager`)**: can read transactions and access dashboard insights
+- **Admin (`admin`)**: full transaction CRUD, full dashboard access, and user management APIs
+
+Dashboard route access in code is enforced for **Admin + Analyst only**.
+
+## API Base
+
+- Base URL: `http://localhost:5000`
+- Prefix: `/api/v1`
+
+## Standard API Response
+
+```json
+{
+  "success": true,
+  "message": "...",
+  "data": {},
+  "error": null
+}
+```
+
+## Transaction APIs
+
+### Create Transaction (Admin only)
+`POST /api/v1/transactions`
+
+```json
+{
+  "amount": 2500,
+  "type": "income",
+  "category": "Salary",
+  "date": "2026-04-01T00:00:00.000Z",
+  "notes": "Monthly payroll"
+}
+```
+
+### List Transactions (All authenticated roles)
+`GET /api/v1/transactions?page=1&limit=10&type=expense&category=Food&startDate=2026-01-01&endDate=2026-04-30`
+
+### Get Transaction
+`GET /api/v1/transactions/:transactionId`
+
+### Update Transaction (Admin only)
+`PATCH /api/v1/transactions/:transactionId`
+
+### Delete Transaction (Admin only)
+`DELETE /api/v1/transactions/:transactionId`
+
+## Dashboard APIs (Mandatory)
+
+All dashboard aggregation logic lives in `dashboard.service.ts`.
+
+### 1) Summary
+`GET /api/v1/dashboard/summary?startDate=2026-01-01&endDate=2026-12-31`
+
+Returns:
+- `totalIncome`
+- `totalExpenses`
+- `netBalance`
+
+### 2) Category Breakdown
+`GET /api/v1/dashboard/categories?startDate=2026-01-01&endDate=2026-12-31`
+
+Returns grouped totals by category.
+
+### 3) Trends
+`GET /api/v1/dashboard/trends?interval=month`
+
+Returns timeseries grouped by month (or week using `interval=week`).
+
+### 4) Recent Transactions
+`GET /api/v1/dashboard/recent?limit=5`
+
+Returns latest N transactions sorted by `date desc`.
+
+## User Management APIs (Admin only)
+
+### List Users
+`GET /api/v1/users`
+
+### Update User Role/Status
+`PATCH /api/v1/users/:userId`
+
+```json
+{
+  "role": "manager",
+  "isActive": true
+}
+```
+
+## Validation
+
+- Body validation for create/update transaction
+- Param validation for ObjectIds
+- Query validation for pagination, filters, date range, interval, and limit
+
+## Environment Variables
+
+Copy `.env.example` into `.env` and configure:
+
+- `NODE_ENV`
+- `PORT`
+- `MONGO_URI`
+- `JWT_ACCESS_SECRET`
+- `JWT_ACCESS_TTL`
+- `RATE_LIMIT_WINDOW_MS`
+- `RATE_LIMIT_MAX`
+
+## Setup
 
 ```bash
 npm install
@@ -94,191 +212,22 @@ cp .env.example .env
 npm run dev
 ```
 
-Build and run production mode:
+## Assumptions
 
-```bash
-npm run build
-npm start
-```
+- Categories are user-defined free-text values.
+- Transaction amounts are stored as positive values; direction comes from `type`.
+- Non-admin users only see their own transactions.
+- Dashboard insights for non-admin users are scoped to their own records.
 
-## 5) Environment Variables
+## Trade-offs
 
-Use `.env` file:
+- Currency handling is not yet modeled (single-currency assumption).
+- No budget/goal model yet.
+- No refresh token flow added to keep scope focused.
 
-| Variable | Description | Example |
-|---|---|---|
-| `NODE_ENV` | Runtime environment | `development` |
-| `PORT` | Server port | `5000` |
-| `MONGO_URI` | MongoDB connection string | `mongodb://localhost:27017/zorvyn_assessment` |
-| `JWT_ACCESS_SECRET` | Secret for access token signing | `super_secret` |
-| `JWT_ACCESS_TTL` | Access token validity | `1h` |
-| `RATE_LIMIT_WINDOW_MS` | Rate-limit window | `900000` |
-| `RATE_LIMIT_MAX` | Max requests per window per IP | `100` |
+## Future Improvements
 
-## 6) API Design
-
-- Base URL: `http://localhost:5000`
-- Versioned prefix: `/api/v1`
-- Standard response envelope:
-
-```json
-{
-  "success": true,
-  "message": "Human readable message",
-  "data": {},
-  "error": null
-}
-```
-
-### Auth Endpoints
-
-#### Register
-`POST /api/v1/auth/register`
-
-```json
-{
-  "name": "Alice",
-  "email": "alice@example.com",
-  "password": "Password123",
-  "role": "manager"
-}
-```
-
-#### Login
-`POST /api/v1/auth/login`
-
-```json
-{
-  "email": "alice@example.com",
-  "password": "Password123"
-}
-```
-
-#### Profile
-`GET /api/v1/auth/me` (Bearer token required)
-
----
-
-### Project Endpoints
-
-#### Create project (admin/manager)
-`POST /api/v1/projects`
-
-```json
-{
-  "name": "Platform Revamp",
-  "description": "Q2 platform work",
-  "members": ["65f1c4c1b5f51f31dc8c21f1"]
-}
-```
-
-#### List projects
-`GET /api/v1/projects`
-
-#### Get project
-`GET /api/v1/projects/:projectId`
-
-#### Update project (admin/owner)
-`PATCH /api/v1/projects/:projectId`
-
----
-
-### Task Endpoints
-
-#### Create task
-`POST /api/v1/tasks`
-
-```json
-{
-  "title": "Implement JWT middleware",
-  "description": "Protect all private endpoints",
-  "project": "65f1c4c1b5f51f31dc8c21f1",
-  "priority": "high",
-  "assignee": "65f1c4c1b5f51f31dc8c21f2",
-  "dueDate": "2026-12-31T00:00:00.000Z"
-}
-```
-
-#### List tasks (pagination/filter/sort)
-`GET /api/v1/tasks?page=1&limit=10&status=todo&priority=high&sortBy=createdAt&sortOrder=desc`
-
-#### Get task
-`GET /api/v1/tasks/:taskId`
-
-#### Update task
-`PATCH /api/v1/tasks/:taskId`
-
-#### Delete task
-`DELETE /api/v1/tasks/:taskId`
-
-## 7) Sample cURL Requests
-
-```bash
-# Register
-curl -X POST http://localhost:5000/api/v1/auth/register \
-  -H "Content-Type: application/json" \
-  -d '{"name":"Alice","email":"alice@example.com","password":"Password123","role":"manager"}'
-
-# Login
-curl -X POST http://localhost:5000/api/v1/auth/login \
-  -H "Content-Type: application/json" \
-  -d '{"email":"alice@example.com","password":"Password123"}'
-
-# List tasks (replace TOKEN)
-curl -X GET "http://localhost:5000/api/v1/tasks?page=1&limit=10" \
-  -H "Authorization: Bearer TOKEN"
-```
-
-## 8) Database Modeling Notes
-
-### User
-- Unique indexed email
-- Hashed password with pre-save hook
-- Role enum for RBAC
-
-### Project
-- `owner` reference to `User`
-- `members` reference array to `User`
-- Compound uniqueness index on `(name, owner)` to reduce duplicates per owner
-
-### Task
-- References to `project`, `assignee`, and `createdBy`
-- Indexes on `status`, `priority`, `dueDate`, and `(project, createdAt)`
-- Designed for fast list queries and filtering
-
-## 9) Assumptions Made
-
-- JWT access-token-only flow is sufficient for this assessment.
-- Managers can create/update projects they own.
-- Members can view resources where they belong but cannot create/update projects.
-- Task updates are allowed for users with project access.
-
-## 10) Design Decisions
-
-- **Layered architecture** to separate concerns.
-- **Zod-based validation middleware** for request input safety.
-- **Centralized error handling** with normalized output.
-- **Service-layer authorization checks** for defense in depth.
-- **Rate limiting and security headers** enabled globally.
-
-## 11) Trade-offs
-
-- No refresh-token/session revocation mechanism to keep scope tight.
-- No full audit trail/events table included.
-- Sorting by arbitrary `sortBy` is accepted for flexibility but could be strict-whitelisted in hardened production.
-
-## 12) Future Improvements
-
-- Add refresh tokens + token revocation.
-- Add stronger authorization policies (resource-scoped permissions).
-- Add OpenAPI/Swagger docs and generated Postman collection.
-- Add integration tests for auth/project/task lifecycle using in-memory MongoDB.
-- Add structured logging (Winston/Pino) and distributed trace context.
-
-## 13) Testing
-
-```bash
-npm run typecheck
-npm test
-```
-
+- Add currency and exchange rate support.
+- Add budget and anomaly detection modules.
+- Add dashboard caching for heavy aggregations.
+- Add integration tests with mongodb-memory-server.

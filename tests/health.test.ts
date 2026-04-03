@@ -1,4 +1,8 @@
 import request from 'supertest';
+
+process.env.MONGO_URI = process.env.MONGO_URI || 'mongodb://localhost:27017/test';
+process.env.JWT_ACCESS_SECRET = process.env.JWT_ACCESS_SECRET || 'test-secret';
+
 import app from '../src/app';
 
 describe('Health endpoint', () => {
